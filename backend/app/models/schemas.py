@@ -1,6 +1,7 @@
 from typing import List
 from pydantic import BaseModel, Field
 
+
 class HealthResponse(BaseModel):
     status: str = "healthy"
     service: str = "StudyMate API"
@@ -24,4 +25,4 @@ class SourceCitation(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
-    sources: List[SourceCitation] = []
+    sources: List[SourceCitation] = Field(default_factory=list)

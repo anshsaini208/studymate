@@ -65,7 +65,7 @@ async def generate_grounded_answer(
     }
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 "https://openrouter.ai/api/v1/chat/completions",
                 headers=headers,

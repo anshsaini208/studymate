@@ -27,4 +27,10 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
+    @classmethod
+    def load(cls):
+        # If .env file exists locally, BaseSettings will pick it up via model_config.
+        # In cloud environments, variables provided in os.environ take standard precedence.
+        return cls()
+
 settings = Settings()

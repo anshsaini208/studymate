@@ -55,3 +55,6 @@ dist-ssr/
 *.swo
 .DS_Store
 Thumbs.db
+
+# FastAPI Cloud
+.fastapicloud/

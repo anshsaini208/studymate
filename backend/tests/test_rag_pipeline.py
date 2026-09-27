@@ -2,6 +2,7 @@ import io
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
+from app.models.schemas import ChatResponse, SourceCitation
 from app.rag.loader import extract_pages_from_pdf, PDFExtractionError
 from app.rag.chunker import chunk_pages
 from app.rag.embeddings import embed_texts
@@ -121,3 +122,13 @@ def test_chat_empty_question():
         json={"document_id": "any_doc", "question": "   "}
     )
     assert response.status_code in [400, 422]
+
+
+def test_chat_response_sources_default_is_not_shared():
+    first = ChatResponse(answer="First answer")
+    second = ChatResponse(answer="Second answer")
+
+    first.sources.append(SourceCitation(filename="test.pdf", page=1, content="Example source"))
+
+    assert len(first.sources) == 1
+    assert len(second.sources) == 0

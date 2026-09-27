@@ -5,12 +5,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const client = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 60000,
+  timeout: 120000, // 120s for processing large PDFs, embeddings, or slow LLM models
 });
 
 export const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<{ detail?: string }>;
+    if (axiosError.code === 'ECONNABORTED' || axiosError.message.includes('timeout')) {
+      return 'The request timed out. The server or AI model is taking longer than expected. Please try again.';
+    }
     if (axiosError.response?.data?.detail) {
       return axiosError.response.data.detail;
     }
