@@ -1,6 +1,8 @@
 import os
-# Ensure OpenMP runtime doesn't collide on Windows
+# Ensure OpenMP runtime doesn't collide on Windows and limits threads in small cloud containers
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -8,17 +10,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.models.schemas import HealthResponse
 from app.api import upload, chat
-from app.rag.embeddings import get_embedding_model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Preload embedding model on startup so initial document uploads don't trigger a 60s timeout
+    # Set PyTorch thread limit to 1 so memory footprint stays minimal in container environments
     try:
-        print("[StudyMate] Preloading sentence-transformers embedding model...")
-        get_embedding_model()
-        print("[StudyMate] Embedding model ready!")
-    except Exception as e:
-        print(f"[StudyMate] Warning: Failed to pre-warm embedding model: {e}")
+        import torch
+        torch.set_num_threads(1)
+        torch.set_num_interop_threads(1)
+    except Exception:
+        pass
     yield
 
 app = FastAPI(
